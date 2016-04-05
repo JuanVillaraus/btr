@@ -95,7 +95,7 @@ class comInterfaz extends Thread {
                             System.out.println("Error #??: el valor a guardar esta fuera de rango");
                         i++;
                     }
-                    a.escribirTxt("resource/dataEj2.txt", texto);
+                    a.escribirTxt("resource/dataEj.txt", texto);
                     window.repaint();
                 }
             } while (true);
