@@ -40,6 +40,7 @@ public class archivo {
             while ((bfRead = bf.readLine()) != null && lim>0) {
                 temp += bfRead;
                 lim--;
+                //System.out.println("lim es: "+lim);
             }
             info = temp;
         } catch (Exception e) {
