@@ -6,10 +6,9 @@
 package BTR;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 import javax.swing.*;
-//import java.net.*;
-//import java.io.*;
+import java.io.*;
+import java.util.Properties;
 
 /**
  *
@@ -19,13 +18,10 @@ public class BTR extends JComponent {
 
     int sizeCanalX = 0;
     int sizeCanalY;
-
     int xi, yi, c;
     String infor;
     int ml[];
-    //Graphics g;
     int gn = 0;
-    
     String ch = "";
     String info;
 
@@ -37,15 +33,61 @@ public class BTR extends JComponent {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
-        //despliegue d = new despliegue();
-        //d.run();
+        
+        window.setAlwaysOnTop(true);
+        window.setFocusable(true);
+        Properties prop = new Properties();
+        InputStream input = null;
+        int posicionX = 0;
+        int posicionY = 0;
+        try {
+            input = new FileInputStream("config.properties");
+            //load a properties file
+            prop.load(input);
+            //get the propperty value and print it out
+            posicionX = Integer.parseInt(prop.getProperty("posicionX"));
+            posicionY = Integer.parseInt(prop.getProperty("posicionY"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        window.setLocation(posicionX, posicionY);
         comInterfaz c = new comInterfaz();
         c.run(window);
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(680, 550);
+        int dimensionX = 100;
+        int dimensionY = 100;
+        Properties prop = new Properties();
+        InputStream input = null;
+        try {
+            input = new FileInputStream("config.properties");
+            //load a properties file
+            prop.load(input);
+            //get the propperty value and print it out
+            dimensionX = Integer.parseInt(prop.getProperty("dimensionX"));
+            dimensionY = Integer.parseInt(prop.getProperty("dimensionY"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new Dimension(dimensionX, dimensionY);
     }
 
     @Override
@@ -64,10 +106,8 @@ public class BTR extends JComponent {
     
     
     public void desp(Graphics g, int limX, int limY) {
-        System.out.println("estoy en el RUN del despliegue");
         archivo a = new archivo();
-
-        String DIR = "resource/dataEj.txt";   //variable estatica que guarda el nombre del archivo donde se guardara la informacion recivida para desplegarse
+        String DIR = "resource/btrData.txt";   //variable estatica que guarda el nombre del archivo donde se guardara la informacion recivida para desplegarse
         int n = 0;  //variable de control int que guarda el numero del color a desplegar
         yi = 100;     //variable de control grafico en Y que guarda la acumulacion del incremento para la graficacion
         xi = 50;     //variable de control grafico en Y que guarda la acumulacion del incremento para la graficacion
