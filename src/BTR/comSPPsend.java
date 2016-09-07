@@ -30,7 +30,7 @@ public class comSPPsend extends Thread {
     boolean habilitado = false;
 
     public comSPPsend() {
-        System.out.println("hilo de comunicacion al SSP modo solicitud a iniciado");
+        System.out.println("hilo de comunicacion al SPP modo solicitud a iniciado");
 
     }
 
@@ -44,7 +44,7 @@ public class comSPPsend extends Thread {
 
     @Override
     public void run() {
-        System.out.println("El run de comunicacion al SSP modo solicitud a iniciado");
+        System.out.println("El run de comunicacion al SPP modo solicitud a iniciado");
         try {
             mensaje_bytes = mensaje.getBytes();
             address = InetAddress.getByName("192.168.1.178");

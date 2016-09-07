@@ -9,6 +9,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  *
@@ -33,7 +35,7 @@ public class BTR extends JComponent {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
-        
+
         window.setAlwaysOnTop(true);
         window.setFocusable(true);
         Properties prop = new Properties();
@@ -61,6 +63,8 @@ public class BTR extends JComponent {
         window.setLocation(posicionX, posicionY);
         comInterfaz c = new comInterfaz();
         c.run(window);
+        //comSPPsend s = new comSPPsend();
+        //s.run();
     }
 
     @Override
@@ -98,13 +102,12 @@ public class BTR extends JComponent {
         g.fillRect(0, 0, getSize().width, getSize().height);
 
         sizeCanalX = (getSize().width - 50) / 11;
-        sizeCanalY = ((getSize().height)-140) / 100;
+        sizeCanalY = ((getSize().height) - 140) / 100;
         //despliegue d = new despliegue();
         desp(g, sizeCanalX, sizeCanalY);
 
     }
-    
-    
+
     public void desp(Graphics g, int limX, int limY) {
         archivo a = new archivo();
         String DIR = "resource/btrData.txt";   //variable estatica que guarda el nombre del archivo donde se guardara la informacion recivida para desplegarse
@@ -140,7 +143,7 @@ public class BTR extends JComponent {
                 if (bTopLine) {
                     topLine[c] = n;
                 }
-                if (n > 0 && n < 255) {
+                if (n >= 0 && n <= 255) {
                     g.setColor(new Color(0, n, 0));
                     g.fillRect(xi, yi, limX, limY);
                     xi += limX + 1;
@@ -154,7 +157,7 @@ public class BTR extends JComponent {
                 if (bTopLine) {
                     topLine[c] = n;
                 }
-                if (n > 0 && n < 255) {
+                if (n >= 0 && n <= 255) {
                     g.setColor(new Color(0, n, 0));
                     g.fillRect(xi, yi, limX, limY);
                     box = "";
@@ -167,6 +170,9 @@ public class BTR extends JComponent {
                     g.setColor(Color.WHITE);
                     g.drawLine(35, yi, 45, yi);
                     g.drawString(t + "", 15, yi + 3);
+                    /*Calendar cal = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    g.drawString(sdf.format(cal.getTime()) + "", 15, yi + 3);*/
                 }
             } else {
                 System.out.println("Error #??: el valor a desplegar no se reconoce");

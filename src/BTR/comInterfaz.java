@@ -67,15 +67,15 @@ class comInterfaz extends Thread {
                 servPaquete = new DatagramPacket(RecogerServidor_bytes, 256);
                 socket.receive(servPaquete);
                 cadenaMensaje = new String(RecogerServidor_bytes).trim();   //Convertimos el mensaje recibido en un string
-                System.out.println(cadenaMensaje);                          //Imprimimos el paquete recibido
+                //System.out.println(cadenaMensaje);                          //Imprimimos el paquete recibido
                 if ("BTR_OFF".equals(cadenaMensaje)) {
-                     window.setVisible(false);
+                    window.setVisible(false);
                     System.out.println("BTR esta deshabilitado");
                     if (cspps.getHabilitado()) {
                         cspps.setHabilitado(false);
                     }
                 } else if ("BTR_ON".equals(cadenaMensaje)) {
-                      window.setVisible(true);
+                    window.setVisible(true);
                     System.out.println("BTR esta habilitado");
                     if (!cspps.getHabilitado()) {
                         cspps.setHabilitado(true);
@@ -83,18 +83,27 @@ class comInterfaz extends Thread {
                 } else if (!("START OK!".equals(cadenaMensaje))) {
                     i = 0;
                     char[] charArray = cadenaMensaje.toCharArray();
-                        texto = "";
-                    for (char temp : charArray) {
-                        if (i < 11 && ((int) temp > 0) && ((int) temp < 255)) {
-                            texto += Integer.toString((int)temp);
-                            if(i==10)
-                                texto += ";";
-                            else
-                                texto += ",";
-                        }else 
+                    texto = "";
+                    //if (!(charArray[1] == 's')) {
+                        /*for (char temp : charArray) {
+                            if (i < 11 && ((int) temp > 0) && ((int) temp < 255)) {
+                                texto += Integer.toString((int) temp);
+                                if (i == 10) {
+                                    texto += ";";
+                                } else {
+                                    texto += ",";
+                                }
+                            } else {
+
+                            }
                             System.out.println("Error #??: el valor a guardar esta fuera de rango");
-                        i++;
-                    }
+                            i++;
+                        }*/
+                    //} else {
+                        for (char temp : charArray) {
+                            texto += temp;
+                        }
+                    //}
                     a.escribirTxt("resource/btrData.txt", texto);
                     window.repaint();
                 }

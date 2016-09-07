@@ -54,9 +54,11 @@ public class archivo {
             BufferedReader bf = new BufferedReader(new FileReader(dir));   
             String temp = "";
             String bfRead;
-            while ((bfRead = bf.readLine()) != null) {
+            int lim=200;
+            while (((bfRead = bf.readLine()) != null)&&(lim>0)) {
                 temp += bfRead;
                 temp += "\n";
+                lim--;
             }
             info = temp;
         } catch (Exception e) {
