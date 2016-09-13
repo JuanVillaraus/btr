@@ -10,6 +10,8 @@ package BTR;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 //import java.net.SocketException;
 //import java.net.UnknownHostException;
 import javax.swing.*;
@@ -83,9 +85,11 @@ class comInterfaz extends Thread {
                 } else if (!("START OK!".equals(cadenaMensaje))) {
                     i = 0;
                     char[] charArray = cadenaMensaje.toCharArray();
-                    texto = "";
+                    Calendar cal = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    texto = sdf.format(cal.getTime()) + ",";
                     //if (!(charArray[1] == 's')) {
-                        /*for (char temp : charArray) {
+                    /*for (char temp : charArray) {
                             if (i < 11 && ((int) temp > 0) && ((int) temp < 255)) {
                                 texto += Integer.toString((int) temp);
                                 if (i == 10) {
@@ -100,9 +104,9 @@ class comInterfaz extends Thread {
                             i++;
                         }*/
                     //} else {
-                        for (char temp : charArray) {
-                            texto += temp;
-                        }
+                    for (char temp : charArray) {
+                        texto += temp;
+                    }
                     //}
                     a.escribirTxt("resource/btrData.txt", texto);
                     window.repaint();

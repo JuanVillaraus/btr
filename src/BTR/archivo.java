@@ -14,14 +14,14 @@ import java.io.*;
 public class archivo {
 
     String info = "";
-    
+
     public String leerTxtLine(String dir) {                                     //lee lo que haya en un archivo txt, recibe como parametros la direccion tipo String y devuelve el String del contenido en una sola linea
         try {
-            int lim=0;
+            int lim = 0;
             BufferedReader bf = new BufferedReader(new FileReader(dir));
             String temp = "";
             String bfRead;
-            while ((bfRead = bf.readLine()) != null || lim<20) {
+            while ((bfRead = bf.readLine()) != null || lim < 20) {
                 temp += bfRead;
                 lim++;
             }
@@ -31,13 +31,13 @@ public class archivo {
         }
         return info;
     }
-    
+
     public String leerTxtLine(String dir, int lim) {                 //lee lo que haya en un archivo txt, recibe como parametros la direccion tipo String y devuelve el String del contenido en una sola linea
         try {
             BufferedReader bf = new BufferedReader(new FileReader(dir));
             String temp = "";
             String bfRead;
-            while ((bfRead = bf.readLine()) != null && lim>0) {
+            while ((bfRead = bf.readLine()) != null && lim > 0) {
                 temp += bfRead;
                 lim--;
                 //System.out.println("lim es: "+lim);
@@ -51,11 +51,11 @@ public class archivo {
 
     public String leerTxt(String dir) {                                         //lee lo que haya en un archivo txt, recibe como parametros la direccion tipo String y devuelve el String del contenido
         try {
-            BufferedReader bf = new BufferedReader(new FileReader(dir));   
+            BufferedReader bf = new BufferedReader(new FileReader(dir));
             String temp = "";
             String bfRead;
-            int lim=200;
-            while (((bfRead = bf.readLine()) != null)&&(lim>0)) {
+            int lim = 200;
+            while (((bfRead = bf.readLine()) != null) && (lim > 0)) {
                 temp += bfRead;
                 temp += "\n";
                 lim--;
