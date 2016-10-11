@@ -142,7 +142,7 @@ public class BTR extends JComponent {
         for (char temp : charArray) {
             if (!(temp == ',') && !(temp == ';')) {
                 if (bTopWord) {
-//                    topWord += temp;
+                    topWord += temp;
                 } else {
                     box += "" + temp;
                 }

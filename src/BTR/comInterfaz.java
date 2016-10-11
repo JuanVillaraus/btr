@@ -46,18 +46,16 @@ class comInterfaz extends Thread {
     public void run(JFrame window) {
         try {
             mensaje_bytes = mensaje.getBytes();
-            address = InetAddress.getByName("192.168.1.178");
+            //address = InetAddress.getByName("192.168.1.178");
+            address = InetAddress.getByName("localhost");
             mensaje = "runBTR";
             mensaje_bytes = mensaje.getBytes();
             paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, 5002);
             socket = new DatagramSocket();
             socket.send(paquete);
             System.out.println("enviamos runBTR");
-            //RecogerServidor_bytes = new byte[256];
             comSPPsend cspps = new comSPPsend();
             cspps.start();
-            //comSSPreceive csppr = new comSSPreceive();
-            //csppr.start();
             for (int i = 0; i < 11; i++) {
                 n[i] = 0;
             }
@@ -71,17 +69,21 @@ class comInterfaz extends Thread {
                 cadenaMensaje = new String(RecogerServidor_bytes).trim();   //Convertimos el mensaje recibido en un string
                 //System.out.println(cadenaMensaje);                          //Imprimimos el paquete recibido
                 if ("BTR_OFF".equals(cadenaMensaje)) {
-                    window.setVisible(false);
+                    window.setExtendedState(JFrame.ICONIFIED);
                     System.out.println("BTR esta deshabilitado");
                     if (cspps.getHabilitado()) {
                         cspps.setHabilitado(false);
                     }
                 } else if ("BTR_ON".equals(cadenaMensaje)) {
-                    window.setVisible(true);
+                    window.setExtendedState(JFrame.NORMAL);
                     System.out.println("BTR esta habilitado");
                     if (!cspps.getHabilitado()) {
                         cspps.setHabilitado(true);
                     }
+                } else if ("BTR_EXIT".equals(cadenaMensaje)) {
+                    System.exit(0);
+                } else if ("BTR_SAVE".equals(cadenaMensaje)) {
+                    a.save("resource/lofarDataRcv.txt");
                 } else if (!("START OK!".equals(cadenaMensaje))) {
                     i = 0;
                     char[] charArray = cadenaMensaje.toCharArray();

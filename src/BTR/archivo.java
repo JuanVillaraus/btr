@@ -6,6 +6,8 @@
 package BTR;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  *
@@ -40,7 +42,6 @@ public class archivo {
             while ((bfRead = bf.readLine()) != null && lim > 0) {
                 temp += bfRead;
                 lim--;
-                //System.out.println("lim es: "+lim);
             }
             info = temp;
         } catch (Exception e) {
@@ -82,6 +83,22 @@ public class archivo {
             bw.close();
         } catch (Exception e) {
             System.err.println("SOY WRITE: No se encontro el archivo " + dir);
+        }
+    }
+    
+    public void save(String dir) {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String date = sdf.format(cal.getTime());
+        BufferedWriter bw;
+        try {
+            File archivo = new File("resource/btrData_" + date + ".txt");
+            info = leerTxt(dir);
+            bw = new BufferedWriter(new FileWriter(archivo));
+            bw.write(info + "\n");
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("SOY SAVE: No se encontro el archivo " + dir);
         }
     }
 }

@@ -24,9 +24,6 @@ public class comSPPsend extends Thread {
     String mensaje = "";
     //Paquete
     DatagramPacket paquete;
-    //String cadenaMensaje = "";
-    //DatagramPacket servPaquete;
-    //byte[] RecogerServidor_bytes = new byte[256];
     boolean habilitado = false;
 
     public comSPPsend() {
@@ -47,12 +44,8 @@ public class comSPPsend extends Thread {
         System.out.println("El run de comunicacion al SPP modo solicitud a iniciado");
         try {
             mensaje_bytes = mensaje.getBytes();
-            address = InetAddress.getByName("192.168.1.178");
-            /*mensaje = "START COMMUNICATION";
-            mensaje_bytes = mensaje.getBytes();
-            paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, 8888);
-            socket = new DatagramSocket();
-            socket.send(paquete);*/
+            //address = InetAddress.getByName("192.168.1.178");
+            address = InetAddress.getByName("localhost");
             mensaje = "BTR";
             mensaje_bytes = mensaje.getBytes();
             paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, 5002);
