@@ -32,21 +32,13 @@ class comInterfaz extends Thread {
     String cadenaMensaje = "";
     DatagramPacket servPaquete;
     byte[] RecogerServidor_bytes = new byte[256];
-    //String str;
-    despliegue d = new despliegue();
-    int[] n = new int[11];
     String texto = "";
-
-    public void comunicacion() { // throws SocketException, UnknownHostException
-
-        System.out.println("inicia public void comunicacion");
-    }
+    int opcion;
 
     //@Override
     public void run(JFrame window) {
         try {
             mensaje_bytes = mensaje.getBytes();
-            //address = InetAddress.getByName("192.168.1.178");
             address = InetAddress.getByName("localhost");
             mensaje = "runBTR";
             mensaje_bytes = mensaje.getBytes();
@@ -56,18 +48,17 @@ class comInterfaz extends Thread {
             System.out.println("enviamos runBTR");
             comSPPsend cspps = new comSPPsend();
             cspps.start();
-            for (int i = 0; i < 11; i++) {
-                n[i] = 0;
-            }
             archivo a = new archivo();
 
-            int i;
+            //int i;
             do {
                 RecogerServidor_bytes = new byte[256];
                 servPaquete = new DatagramPacket(RecogerServidor_bytes, 256);
                 socket.receive(servPaquete);
                 cadenaMensaje = new String(RecogerServidor_bytes).trim();   //Convertimos el mensaje recibido en un string
                 //System.out.println(cadenaMensaje);                          //Imprimimos el paquete recibido
+                opcion = 1;
+                texto = "";
                 if ("BTR_OFF".equals(cadenaMensaje)) {
                     window.setExtendedState(JFrame.ICONIFIED);
                     System.out.println("BTR esta deshabilitado");
@@ -83,34 +74,19 @@ class comInterfaz extends Thread {
                 } else if ("BTR_EXIT".equals(cadenaMensaje)) {
                     System.exit(0);
                 } else if ("BTR_SAVE".equals(cadenaMensaje)) {
-                    a.save("resource/lofarDataRcv.txt");
+                    a.save("resource/btrData.txt");
+                } else if ("BTR_RP".equals(cadenaMensaje)) {                    //BTR repaint
+                    window.repaint();
                 } else if (!("START OK!".equals(cadenaMensaje))) {
-                    i = 0;
                     char[] charArray = cadenaMensaje.toCharArray();
-                    Calendar cal = Calendar.getInstance();
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    texto = sdf.format(cal.getTime()) + ",";
-                    //if (!(charArray[1] == 's')) {
-                    /*for (char temp : charArray) {
-                            if (i < 11 && ((int) temp > 0) && ((int) temp < 255)) {
-                                texto += Integer.toString((int) temp);
-                                if (i == 10) {
-                                    texto += ";";
-                                } else {
-                                    texto += ",";
-                                }
-                            } else {
-
-                            }
-                            System.out.println("Error #??: el valor a guardar esta fuera de rango");
-                            i++;
-                        }*/
-                    //} else {
                     for (char temp : charArray) {
                         texto += temp;
                     }
-                    //}
-                    a.escribirTxt("resource/btrData.txt", texto);
+                    Calendar cal = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    texto = sdf.format(cal.getTime()) + ",";
+                    a.escribirTxtLine("resource/btrData.txt", texto);
+
                     window.repaint();
                 }
             } while (true);

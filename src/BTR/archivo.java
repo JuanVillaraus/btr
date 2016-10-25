@@ -23,13 +23,13 @@ public class archivo {
             BufferedReader bf = new BufferedReader(new FileReader(dir));
             String temp = "";
             String bfRead;
-            while ((bfRead = bf.readLine()) != null || lim < 20) {
+            while ((bfRead = bf.readLine()) != null && lim < 20) {
                 temp += bfRead;
                 lim++;
             }
             info = temp;
         } catch (Exception e) {
-            System.err.println("SOY READ: No se encontro el archivo");
+            System.err.println("SOY READ LINE: No se encontro el archivo en " + dir);
         }
         return info;
     }
@@ -45,7 +45,7 @@ public class archivo {
             }
             info = temp;
         } catch (Exception e) {
-            System.err.println("SOY READ: No se encontro el archivo");
+            System.err.println("SOY READ LINE con lim: No se encontro el archivo en " + dir);
         }
         return info;
     }
@@ -63,12 +63,12 @@ public class archivo {
             }
             info = temp;
         } catch (Exception e) {
-            System.err.println("SOY READ: No se encontro el archivo");
+            System.err.println("SOY READ: No se encontro el archivo en " + dir);
         }
         return info;
     }
 
-    public void escribirTxt(String dir, String texto) throws IOException {      //escribe un texto en una archivo existente o lo crea, recibe como parametro la direccion del texto y el texto ambos tipo String
+    public void escribirTxtLine(String dir, String texto) throws IOException {      //escribe un texto en una archivo existente o lo crea, recibe como parametro la direccion del texto y el texto ambos tipo String
         BufferedWriter bw;
         try {
             File archivo = new File(dir);
@@ -82,10 +82,22 @@ public class archivo {
             }
             bw.close();
         } catch (Exception e) {
-            System.err.println("SOY WRITE: No se encontro el archivo " + dir);
+            System.err.println("SOY WRITE LINE: hay un error ");
         }
     }
-    
+
+    public void escribirTxt(String dir, String texto) throws IOException {      //escribe un texto en una archivo existente o lo crea, recibe como parametro la direccion del texto y el texto ambos tipo String
+        BufferedWriter bw;
+        try {
+            File archivo = new File(dir);
+            bw = new BufferedWriter(new FileWriter(archivo));
+            bw.write(texto);
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("SOY WRITE hay un error ");
+        }
+    }
+
     public void save(String dir) {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

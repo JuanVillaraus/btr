@@ -9,6 +9,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.Properties;
+import java.lang.Object;
 
 /**
  *
@@ -63,8 +64,6 @@ public class BTR extends JComponent {
         window.setLocation(posicionX, posicionY);
         comInterfaz c = new comInterfaz();
         c.run(window);
-        //comSPPsend s = new comSPPsend();
-        //s.run();
     }
 
     @Override
@@ -103,7 +102,6 @@ public class BTR extends JComponent {
 
         sizeCanalX = (getSize().width - inicioCascadaX - 11) / 11;
         sizeCanalY = ((getSize().height) - inicioCascadaY) / 100;
-        //despliegue d = new despliegue();
         desp(g, sizeCanalX, sizeCanalY);
 
     }
@@ -122,12 +120,13 @@ public class BTR extends JComponent {
         c = 0;
         int t = 0;
 
+        int colorUp = Integer.parseInt(a.leerTxtLine("resource/colorUp.txt"));
+        int colorDw = Integer.parseInt(a.leerTxtLine("resource/colorDw.txt"));
+
         g.setColor(Color.WHITE);
-        g.drawLine(inicioCascadaX - 5, 1, inicioCascadaX - 5, inicioCascadaY-30);
-        g.drawLine(inicioCascadaX - 5, inicioCascadaY-30, getSize().width, inicioCascadaY-30);
+        g.drawLine(inicioCascadaX - 5, 1, inicioCascadaX - 5, inicioCascadaY - 30);
+        g.drawLine(inicioCascadaX - 5, inicioCascadaY - 30, getSize().width, inicioCascadaY - 30);
         g.drawLine(inicioCascadaX - 5, inicioCascadaY, inicioCascadaX - 5, getSize().height - 20);
-        //g.drawLine(inicioCascadaX - 5, getSize().height - 20, getSize().width, getSize().height - 20);
-        //g.drawString("t/seg", 5, 100);
         for (int i = 0; i < 7; i++) {
             g.drawLine(inicioCascadaX + (((getSize().width - inicioCascadaX) / 6) * i), inicioCascadaY - 30, inicioCascadaX + (((getSize().width - inicioCascadaX) / 6) * i), inicioCascadaY - 25);
             if (i != 6) {
@@ -155,7 +154,13 @@ public class BTR extends JComponent {
                         topLine[c] = n;
                     }
                     if (n >= 0 && n <= 255) {
-                        g.setColor(new Color(0, n, 0));
+                        if (n < colorDw) {
+                            g.setColor(Color.BLACK);
+                        } else if (n > colorUp) {
+                            g.setColor(Color.GREEN);
+                        } else {
+                            g.setColor(new Color(0, (n-colorDw) * 255 / (colorUp - colorDw), 0));
+                        }
                         g.fillRect(xi, yi, limX, limY);
                         xi += limX + 1;
                         box = "";
@@ -170,7 +175,13 @@ public class BTR extends JComponent {
                     topLine[c] = n;
                 }
                 if (n >= 0 && n <= 255) {
-                    g.setColor(new Color(0, n, 0));
+                    if (n < colorDw) {
+                            g.setColor(Color.BLACK);
+                        } else if (n > colorUp) {
+                            g.setColor(Color.GREEN);
+                        } else {
+                            g.setColor(new Color(0, (n-colorDw) * 255 / (colorUp - colorDw), 0));
+                        }
                     g.fillRect(xi, yi, limX, limY);
                     box = "";
                     bTopLine = false;
@@ -190,11 +201,17 @@ public class BTR extends JComponent {
             }
         }
         xi = (limX / 2) + inicioCascadaX;
-        //yi = inicioCascadaY;
         g.setColor(new Color(0, 150, 0));
         for (int i = 0; i < 10; i++) {
             g.drawLine(xi, 95 - (topLine[i] * 90 / 255), xi + limX, 95 - (topLine[i + 1] * 90 / 255));
             xi += limX;
         }
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.WHITE);
+        float[] dash = {5};
+        g2d.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, dash, 0.0f));
+        g2d.drawLine(inicioCascadaX - 5, 95 - (colorUp * 90 / 255), getSize().width, 95 - (colorUp * 90 / 255));
+        g2d.drawLine(inicioCascadaX - 5, 95 - (colorDw * 90 / 255), getSize().width, 95 - (colorDw * 90 / 255));
     }
 }
