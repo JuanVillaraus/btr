@@ -23,9 +23,9 @@ public class BTR extends JComponent {
     int sizeCanalY;
     int xi, yi, c;
     String infor;
-    int ml[];
+    //int ml[];
     int gn = 0;
-    String ch = "";
+    //String ch = "";
     String info;
 
     public static void main(String[] args) {
