@@ -23,10 +23,9 @@ public class BTR extends JComponent {
     int sizeCanalY;
     int xi, yi, c;
     String infor;
-    //int ml[];
     int gn = 0;
-    //String ch = "";
     String info;
+    int longBTR;
 
     public static void main(String[] args) {
         JFrame window = new JFrame("BTR by SIVISO");
@@ -43,11 +42,10 @@ public class BTR extends JComponent {
         InputStream input = null;
         int posicionX = 0;
         int posicionY = 0;
+        
         try {
             input = new FileInputStream("config.properties");
-            //load a properties file
             prop.load(input);
-            //get the propperty value and print it out
             posicionX = Integer.parseInt(prop.getProperty("posicionX"));
             posicionY = Integer.parseInt(prop.getProperty("posicionY"));
         } catch (IOException ex) {
@@ -79,6 +77,7 @@ public class BTR extends JComponent {
             //get the propperty value and print it out
             dimensionX = Integer.parseInt(prop.getProperty("dimensionX"));
             dimensionY = Integer.parseInt(prop.getProperty("dimensionY"));
+            longBTR = Integer.parseInt(prop.getProperty("longBTR"));
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -96,11 +95,11 @@ public class BTR extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         gn++;
-        System.out.println("paint component ciclo numero: " + gn);
+        //System.out.println("paint component ciclo numero: " + gn);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getSize().width, getSize().height);
 
-        sizeCanalX = (getSize().width - inicioCascadaX - 11) / 11;
+        sizeCanalX = (getSize().width - inicioCascadaX) / longBTR;
         sizeCanalY = ((getSize().height) - inicioCascadaY) / 100;
         desp(g, sizeCanalX, sizeCanalY);
 
