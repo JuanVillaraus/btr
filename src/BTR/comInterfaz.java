@@ -45,6 +45,8 @@ class comInterfaz extends Thread {
             System.out.println("enviamos runBTR para inicializar la comunicación con el software");
             comSPPsend cspps = new comSPPsend();
             cspps.start();
+            comSPV cspv = new comSPV();
+            cspv.start();
             archivo a = new archivo();
 
             do {
@@ -59,11 +61,17 @@ class comInterfaz extends Thread {
                     if (cspps.getHabilitado()) {
                         cspps.setHabilitado(false);
                     }
+                    if(cspv.getHabilitado()){
+                        cspv.setHabilitado(false);
+                    }
                 } else if ("ON".equals(cadenaMensaje)) {
                     window.setExtendedState(JFrame.NORMAL);
                     //System.out.println("BTR esta habilitado");
                     if (!cspps.getHabilitado()) {
                         cspps.setHabilitado(true);
+                    }
+                    if(!cspv.getHabilitado()){
+                        cspv.setHabilitado(true);
                     }
                 } else if ("EXIT".equals(cadenaMensaje)) {
                     System.exit(0);
