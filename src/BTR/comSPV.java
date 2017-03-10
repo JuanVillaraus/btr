@@ -10,6 +10,7 @@ import java.net.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import javax.swing.JFrame;
 
 /**
  *
@@ -37,7 +38,7 @@ public class comSPV extends Thread {
         this.habilitado = h;
     }
 
-    public void run() {
+    public void run(JFrame windows) {
         try {
             //socket = new Socket("127.0.0.1", 6001);
             socket = new Socket("172.16.1.39", 6001);
@@ -55,7 +56,6 @@ public class comSPV extends Thread {
                     if ("Beamforming OK".equals(msn)) {
                         error = true;
                         System.out.println("Error: esperba <Beamforming OK> y recibí <" + msn + ">, Compruebe la comunicación");
-                        System.out.println("se detecto un error retransmitire el comando <DatosBTR>");
                     }
                     if (!error) {
                         mensaje = "BTR1\n";
@@ -73,7 +73,7 @@ public class comSPV extends Thread {
                                     texto += ",";
                                 } else {
                                     error = true;
-                                    System.out.println("Error: dato en la posicion " + nDatos + " no encontrado");
+                                    System.out.println("Error: dato en la posicion " + nDatos + " no fue encontrado");
                                 }
                             }
                             if (temp == ';') {
@@ -116,7 +116,7 @@ public class comSPV extends Thread {
                                             texto += temp;
                                         } else {
                                             error = true;
-                                            System.out.println("Error: dato en la posicion " + nDatos + " no encontrado");
+                                            System.out.println("Error: dato en la posicion " + nDatos + " no fue encontrado");
                                         }
 
                                     }
@@ -126,6 +126,7 @@ public class comSPV extends Thread {
                                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                                     texto = sdf.format(cal.getTime()) + "," + texto;
                                     a.escribirTxtLine("resource/btrData.txt", texto);
+                                    windows.repaint();
                                 }
                             }
                         }

@@ -47,6 +47,7 @@ class comInterfaz extends Thread {
             cspps.start();
             comSPV cspv = new comSPV();
             cspv.start();
+            //cspv.run(window);
             archivo a = new archivo();
 
             do {
