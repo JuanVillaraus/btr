@@ -5,7 +5,6 @@
  */
 package BTR;
 
-import com.sun.xml.internal.ws.api.message.Message;
 import java.net.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -29,6 +28,7 @@ public class comSPV extends Thread {
     boolean error;
     boolean habilitado = false;
     int t = 1000;
+    JFrame window;
 
     public boolean getHabilitado() {
         return this.habilitado;
@@ -37,30 +37,42 @@ public class comSPV extends Thread {
     public void setHabilitado(boolean h) {
         this.habilitado = h;
     }
+    
+    public void setWindow(JFrame window) {
+        this.window = window;
+    }
 
-    public void run(JFrame windows) {
+    public void run() {
         try {
             //socket = new Socket("127.0.0.1", 6001);
-            socket = new Socket("172.16.1.39", 6001);
+            socket = new Socket("192.168.1.10", 30000);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             BufferedReader inp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             archivo a = new archivo();
-            
+            sleep(1000);
+
             while (true) {
                 if (getHabilitado()) {
                     //mensaje = in.readLine();
                     error = false;
+                    texto = "";
+                    word = "";
+                    nDatos = 0;
                     mensaje = "DatosBTR\n";
                     out.writeUTF(mensaje);
+                    System.out.println("Envie: " + mensaje);
                     msn = inp.readLine();
-                    if ("Beamforming OK".equals(msn)) {
+                    System.out.println("Recibí: " + msn);
+                    if (!("Beamforming OK".equals(msn))) {
                         error = true;
                         System.out.println("Error: esperba <Beamforming OK> y recibí <" + msn + ">, Compruebe la comunicación");
                     }
                     if (!error) {
                         mensaje = "BTR1\n";
                         out.writeUTF(mensaje);
+                        System.out.println("Envie: " + mensaje);
                         msn = inp.readLine();
+                        System.out.println("Recibí: " + msn);
                         char[] charArray = msn.toCharArray();
                         for (char temp : charArray) {
                             if (temp == '1' || temp == '2' || temp == '3' || temp == '4' || temp == '5' || temp == '6' || temp == '7' || temp == '8' || temp == '9' || temp == '0') {
@@ -71,6 +83,7 @@ public class comSPV extends Thread {
                                 if (word != "") {
                                     texto += word;
                                     texto += ",";
+                                    word = "";
                                 } else {
                                     error = true;
                                     System.out.println("Error: dato en la posicion " + nDatos + " no fue encontrado");
@@ -87,10 +100,11 @@ public class comSPV extends Thread {
                             nDatos = 0;
                             error = false;
                             word = "";
-                            texto = "";
                             mensaje = "BTR2\n";
+                            System.out.println("Envie: " + mensaje);
                             out.writeUTF(mensaje);
-                            msn += inp.readLine();
+                            msn = inp.readLine();
+                            System.out.println("Recibí: " + msn);
                             charArray = msn.toCharArray();
                             for (char temp : charArray) {
                                 if (temp == ',' || temp == ';') {
@@ -114,6 +128,7 @@ public class comSPV extends Thread {
                                         if (word != "") {
                                             texto += word;
                                             texto += temp;
+                                            word = "";
                                         } else {
                                             error = true;
                                             System.out.println("Error: dato en la posicion " + nDatos + " no fue encontrado");
@@ -125,8 +140,9 @@ public class comSPV extends Thread {
                                     Calendar cal = Calendar.getInstance();
                                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                                     texto = sdf.format(cal.getTime()) + "," + texto;
+                                    System.out.println("Guardaré: " + texto);
                                     a.escribirTxtLine("resource/btrData.txt", texto);
-                                    windows.repaint();
+                                    window.repaint();
                                 }
                             }
                         }

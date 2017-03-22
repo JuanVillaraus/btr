@@ -31,6 +31,8 @@ class comInterfaz extends Thread {
     DatagramPacket servPaquete;
     byte[] RecogerServidor_bytes = new byte[256];
     String texto = "";
+    Properties prop = new Properties();
+    InputStream input = null;
 
     //@Override
     public void run(JFrame window) {
@@ -44,10 +46,31 @@ class comInterfaz extends Thread {
             socket.send(paquete);
             System.out.println("enviamos runBTR para inicializar la comunicación con el software");
             comSPPsend cspps = new comSPPsend();
-            cspps.start();
             comSPV cspv = new comSPV();
-            cspv.start();
-            //cspv.run(window);
+            cspv.setHabilitado(true);
+            cspv.setWindow(window);
+            try {
+                input = new FileInputStream("config.properties");
+                prop.load(input);
+                mensaje = "LONG" + prop.getProperty("modelo") + ";";
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } finally {
+                if (input != null) {
+                    try {
+                        input.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if ("SSPP".equals(mensaje)) {
+                cspps.start();
+            }else if ("SSF".equals(mensaje)) {
+                cspps.start();
+            }else if ("SSPV".equals(mensaje)) {
+                cspv.start();
+            }
             archivo a = new archivo();
 
             do {
@@ -58,20 +81,18 @@ class comInterfaz extends Thread {
                 texto = "";
                 if ("OFF".equals(cadenaMensaje)) {
                     window.setExtendedState(JFrame.ICONIFIED);
-                    //System.out.println("BTR esta deshabilitado");
                     if (cspps.getHabilitado()) {
                         cspps.setHabilitado(false);
                     }
-                    if(cspv.getHabilitado()){
+                    if (cspv.getHabilitado()) {
                         cspv.setHabilitado(false);
                     }
                 } else if ("ON".equals(cadenaMensaje)) {
                     window.setExtendedState(JFrame.NORMAL);
-                    //System.out.println("BTR esta habilitado");
                     if (!cspps.getHabilitado()) {
                         cspps.setHabilitado(true);
                     }
-                    if(!cspv.getHabilitado()){
+                    if (!cspv.getHabilitado()) {
                         cspv.setHabilitado(true);
                     }
                 } else if ("EXIT".equals(cadenaMensaje)) {
@@ -80,9 +101,7 @@ class comInterfaz extends Thread {
                     a.save("resource/btrData.txt");
                 } else if ("RP".equals(cadenaMensaje)) {                    //BTR repaint
                     window.repaint();
-                } else if ("LONG".equals(cadenaMensaje)) {                    
-                    Properties prop = new Properties();
-                    InputStream input = null;
+                } else if ("LONG".equals(cadenaMensaje)) {
                     try {
                         input = new FileInputStream("config.properties");
                         prop.load(input);

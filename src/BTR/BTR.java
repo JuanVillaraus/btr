@@ -112,7 +112,7 @@ public class BTR extends JComponent {
         yi = inicioCascadaY;     //variable de control grafico en Y que guarda la acumulacion del incremento para la graficacion
         xi = inicioCascadaX;     //variable de control grafico en Y que guarda la acumulacion del incremento para la graficacion
         String box = ""; //variable que guarda de char en char hasta llegar al tope asignado para proceder a convertirlo a int
-        int[] topLine = new int[11];
+        int[] topLine = new int[longBTR];
         String topWord = "";
         boolean bTopLine = true;
         boolean bTopWord = true;
@@ -149,7 +149,7 @@ public class BTR extends JComponent {
                     bTopWord = false;
                 } else {
                     n = Integer.parseInt(box);
-                    if (bTopLine) {
+                    if (bTopLine && c<longBTR) {
                         topLine[c] = n;
                     }
                     if (n >= 0 && n <= 255) {
@@ -170,7 +170,7 @@ public class BTR extends JComponent {
                 }
             } else if (temp == ';') {
                 n = Integer.parseInt(box);
-                if (bTopLine) {
+                if (bTopLine && c<longBTR) {
                     topLine[c] = n;
                 }
                 if (n >= 0 && n <= 255) {
@@ -201,7 +201,7 @@ public class BTR extends JComponent {
         }
         xi = (limX / 2) + inicioCascadaX;
         g.setColor(new Color(0, 150, 0));
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < longBTR-1; i++) {
             g.drawLine(xi, 95 - (topLine[i] * 90 / 255), xi + limX, 95 - (topLine[i + 1] * 90 / 255));
             xi += limX;
         }
