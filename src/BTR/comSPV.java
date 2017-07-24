@@ -24,11 +24,14 @@ public class comSPV extends Thread {
     String msn;
     String texto;
     String word;
+    String save;
     int nDatos;
     boolean error;
     boolean habilitado = false;
     int t = 1000;
     JFrame window;
+    despliegue desp;
+    
 
     public boolean getHabilitado() {
         return this.habilitado;
@@ -41,38 +44,63 @@ public class comSPV extends Thread {
     public void setWindow(JFrame window) {
         this.window = window;
     }
+    
+    public void setMarcacion(boolean b){
+        System.out.println("marcacion desde SPV");
+        desp.setBMarcacion(b);
+    }
+    
+    public String getSave(){
+        save = "";
+        int[][]waterfall = desp.getWaterfall();
+        String[]time = desp.getTime();
+        for (int x = 0; x < waterfall.length; x++) {
+            save += time[x];
+            for (int y = 0; y < waterfall[x].length; y++) {
+                save += "," + waterfall[x][y];
+            }
+            save += ";\n";
+        }
+        return save;
+    }
 
     public void run() {
         try {
+            desp = new despliegue(this.window);
             //socket = new Socket("127.0.0.1", 6001);
-            socket = new Socket("192.168.1.10", 30000);
+            socket = new Socket("192.168.1.10", 20000);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             BufferedReader inp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             archivo a = new archivo();
             sleep(1000);
+            //System.out.println("estoy en el run cpmspv");
+            int n=0;
+            String hora;
 
             while (true) {
+                //System.out.println("estoy en el while true");
                 if (getHabilitado()) {
-                    //mensaje = in.readLine();
+                    //sleep(30);
+                    //  mensaje = in.readLine();
                     error = false;
                     texto = "";
                     word = "";
                     nDatos = 0;
-                    mensaje = "DatosBTR\n";
+                    mensaje = "DatosBTR";
                     out.writeUTF(mensaje);
-                    System.out.println("Envie: " + mensaje);
+                    //System.out.println("Envie: " + mensaje);
                     msn = inp.readLine();
-                    System.out.println("Recibí: " + msn);
-                    if (!("Beamforming OK".equals(msn))) {
+                    //System.out.println("Recibí: " + msn);
+                    /*if (!("Beamforming OK".equals(msn))) {
                         error = true;
                         System.out.println("Error: esperba <Beamforming OK> y recibí <" + msn + ">, Compruebe la comunicación");
-                    }
+                    }*/
                     if (!error) {
-                        mensaje = "BTR1\n";
+                        mensaje = "BTR1";
                         out.writeUTF(mensaje);
-                        System.out.println("Envie: " + mensaje);
+                        //System.out.println("Envie: " + mensaje);
                         msn = inp.readLine();
-                        System.out.println("Recibí: " + msn);
+                        //System.out.println("Recibí: " + msn);
                         char[] charArray = msn.toCharArray();
                         for (char temp : charArray) {
                             if (temp == '1' || temp == '2' || temp == '3' || temp == '4' || temp == '5' || temp == '6' || temp == '7' || temp == '8' || temp == '9' || temp == '0') {
@@ -100,11 +128,11 @@ public class comSPV extends Thread {
                             nDatos = 0;
                             error = false;
                             word = "";
-                            mensaje = "BTR2\n";
-                            System.out.println("Envie: " + mensaje);
+                            mensaje = "BTR2";
+                            //System.out.println("Envie: " + mensaje);
                             out.writeUTF(mensaje);
                             msn = inp.readLine();
-                            System.out.println("Recibí: " + msn);
+                            //System.out.println("Recibí: " + msn);
                             charArray = msn.toCharArray();
                             for (char temp : charArray) {
                                 if (temp == ',' || temp == ';') {
@@ -125,7 +153,7 @@ public class comSPV extends Thread {
                                     }
                                     if (temp == ',' || temp == ';') {
                                         nDatos++;
-                                        if (word != "") {
+                                        if (word != null) {
                                             texto += word;
                                             texto += temp;
                                             word = "";
@@ -139,17 +167,20 @@ public class comSPV extends Thread {
                                 if (!error) {
                                     Calendar cal = Calendar.getInstance();
                                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                                    texto = sdf.format(cal.getTime()) + "," + texto;
-                                    System.out.println("Guardaré: " + texto);
-                                    a.escribirTxtLine("resource/btrData.txt", texto);
-                                    window.repaint();
+                                    hora = sdf.format(cal.getTime());
+                                    //System.out.println("Graficaré: " + texto);
+                                    //a.escribirTxtLine("resource/btrData.txt", texto);
+                                    //window.repaint();
+                                    desp.setInfo(texto,hora);
                                 }
                             }
                         }
                     }
+                } else {
+                    sleep(2000);
                 }
                 try {
-                    sleep(t);                                //espera un segundo
+                    //sleep(t);                                //espera un segundo
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                 }

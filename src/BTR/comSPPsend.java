@@ -23,6 +23,7 @@ public class comSPPsend extends Thread {
     InetAddress address;
     byte[] mensaje_bytes = new byte[256];
     String mensaje = "";
+    int puerto = 0;
     //Paquete
     DatagramPacket paquete;
     boolean habilitado = false;
@@ -39,6 +40,10 @@ public class comSPPsend extends Thread {
     public void setHabilitado(boolean h) {
         this.habilitado = h;
     }
+    
+    public void setPuerto(int puerto){
+        this.puerto = puerto;
+    }
 
     @Override
     public void run() {
@@ -47,8 +52,9 @@ public class comSPPsend extends Thread {
             address = InetAddress.getByName("localhost");
             mensaje = "BTR";
             mensaje_bytes = mensaje.getBytes();
-            paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, 5002);
+            paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
             socket = new DatagramSocket();
+            socket.send(paquete);
             int n = 0;
             Properties prop = new Properties();
             InputStream input = null;
@@ -71,6 +77,7 @@ public class comSPPsend extends Thread {
                 if (getHabilitado()) {
                     n++;
                     System.out.println(n);
+                    sleep(t);      
                     socket.send(paquete);
                 }
                 try {
