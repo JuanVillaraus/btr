@@ -5,15 +5,10 @@
  */
 package BTR;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Properties;
+import java.io.*;
+import java.net.*;
+import java.text.*;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -49,40 +44,47 @@ class comInterfaz extends Thread {
                 input = new FileInputStream("config.properties");
                 prop.load(input);
                 modelo = prop.getProperty("modelo");
-                System.out.println(modelo);
+                //System.out.println(modelo);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                System.err.println(ex.getMessage());
             } finally {
                 if (input != null) {
                     try {
                         input.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println("Error BTR en la carga del config: " + e.getMessage());
                     }
                 }
             }
-            if ("SSPP".equals(modelo)) {
-                puerto = 5001;
-                cspps.setPuerto(puerto);
-                cspps.start();
-                desp = new despliegue(window);
-            } else if ("SSF".equals(modelo)) {
-                puerto = 5002;
-                cspps.setPuerto(puerto);
-                cspps.start();
-                desp = new despliegue(window);
-            } else if ("SSPV".equals(modelo)) {
-                puerto = 5003;
-                cspv.start();
+            if (null != modelo) {
+                switch (modelo) {
+                    case "SSPP":
+                        puerto = 5001;
+                        cspps.setPuerto(puerto);
+                        cspps.start();
+                        desp = new despliegue(window);
+                        break;
+                    case "SSF":
+                        puerto = 5002;
+                        cspps.setPuerto(puerto);
+                        cspps.start();
+                        desp = new despliegue(window);
+                        break;
+                    case "SSPV":
+                        puerto = 5003;
+                        break;
+                    default:
+                        break;
+                }
             }
-            System.out.println(puerto);
+            //System.out.println(puerto);
             address = InetAddress.getByName("localhost");
             mensaje = "runBTR";
             mensaje_bytes = mensaje.getBytes();
             paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
             socket = new DatagramSocket();
             socket.send(paquete);
-            System.out.println("enviamos " + mensaje + " para inicializar la comunicación con el software");
+            System.out.println("enviamos " + mensaje + " para inicializar la comunicación con la interfaz");
             archivo a = new archivo();
             String hora;
 
@@ -93,62 +95,80 @@ class comInterfaz extends Thread {
                 cadenaMensaje = new String(RecogerServidor_bytes).trim();   //Convertimos el mensaje recibido en un string
                 System.out.println("Recibí: " + cadenaMensaje);
                 texto = "";
-                if ("OFF".equals(cadenaMensaje)) {
-                    window.setExtendedState(JFrame.ICONIFIED);
-                    cspps.setHabilitado(false);
-                    cspv.setHabilitado(false);
-                } else if ("ON".equals(cadenaMensaje)) {
-                    window.setExtendedState(JFrame.NORMAL);
-                    cspps.setHabilitado(true);
-                    cspv.setHabilitado(true);
-                } else if ("EXIT".equals(cadenaMensaje)) {
-                    System.exit(0);
-                } else if ("SAVE".equals(cadenaMensaje)) {
-                    if ("SSPV".equals(modelo)) {
-                        a.save("resource/btrData.txt", cspv.getSave());
-                    }
-                } else if ("RP".equals(cadenaMensaje)) {                    //BTR repaint
-                    window.repaint();
-                } else if ("M_ON".equals(cadenaMensaje)) {
-                    cspv.setMarcacion(true);
-                } else if ("M_OFF".equals(cadenaMensaje)) {
-                    cspv.setMarcacion(false);
-                } else if ("LONG".equals(cadenaMensaje)) {
-                    try {
-                        input = new FileInputStream("config.properties");
-                        prop.load(input);
-                        mensaje = "LONG" + prop.getProperty("longBTR") + ";";
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        if (input != null) {
-                            try {
-                                input.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                switch (cadenaMensaje) {
+                    case "RUN":
+                        cspv.start();
+                        try {
+                            sleep(300);
+                        } catch (Exception e) {
+                            Thread.currentThread().interrupt();
+                            System.err.println("Error en el sleep del start en comInterfaz" + e.getMessage());
+                        }
+                    case "OFF":
+                        window.setExtendedState(JFrame.ICONIFIED);
+                        cspps.setHabilitado(false);
+                        cspv.setHabilitado(false);
+                        break;
+                    case "ON":
+                        window.setExtendedState(JFrame.NORMAL);
+                        cspps.setHabilitado(true);
+                        cspv.setHabilitado(true);
+                        break;
+                    case "EXIT":
+                        System.exit(0);
+                        break;
+                    case "SAVE":
+                        if ("SSPV".equals(modelo)) {
+                            a.save("resource/btrData.txt", cspv.getSave());
+                        }
+                        break;
+                    case "RP":
+                        window.repaint();
+                        break;
+                    case "M_ON":
+                        cspv.setMarcacion(true);
+                        break;
+                    case "M_OFF":
+                        cspv.setMarcacion(false);
+                        break;
+                    case "LONG":
+                        try {
+                            input = new FileInputStream("config.properties");
+                            prop.load(input);
+                            mensaje = "LONG" + prop.getProperty("longBTR") + ";";
+                        } catch (IOException e) {
+                            System.err.println(e.getMessage());
+                        } finally {
+                            if (input != null) {
+                                try {
+                                    input.close();
+                                } catch (IOException e) {
+                                    System.err.println(e.getMessage());
+                                }
                             }
                         }
-                    }
-                    mensaje_bytes = mensaje.getBytes();
-                    paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
-                    socket.send(paquete);
-                } else if (!("START OK!".equals(cadenaMensaje))) {
-                    char[] charArray = cadenaMensaje.toCharArray();
-                    for (char temp : charArray) {
-                        texto += temp;
-                    }
-                    if ("SSPP".equals(modelo)||"SSF".equals(modelo)) {
-                        Calendar cal = Calendar.getInstance();
-                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                        hora = sdf.format(cal.getTime());
-                        //a.escribirTxtLine("resource/btrData.txt", texto);
-                        //window.repaint();
-                        desp.setInfo(texto, hora);
-                    }
+                        mensaje_bytes = mensaje.getBytes();
+                        paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
+                        socket.send(paquete);
+                        break;
+                    default:
+                        char[] charArray = cadenaMensaje.toCharArray();
+                        for (char temp : charArray) {
+                            texto += temp;
+                        }
+                        if ("SSPP".equals(modelo) || "SSF".equals(modelo)) {
+                            Calendar cal = Calendar.getInstance();
+                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                            hora = sdf.format(cal.getTime());
+                            //a.escribirTxtLine("resource/btrData.txt", texto);
+                            //window.repaint();
+                            desp.setInfo(texto, hora);
+                        }
+                        break;
                 }
             } while (true);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error en la comunicación con la consola " + e.getMessage());
             System.exit(1);
         }
     }

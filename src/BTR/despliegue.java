@@ -33,6 +33,7 @@ public class despliegue extends JComponent {
     private int[] iActual;
     private int[][] waterfall;
     private String[] time;
+    int marcacionF = 0;
 
     public despliegue(JFrame window) {
         window.add(this);
@@ -63,21 +64,21 @@ public class despliegue extends JComponent {
             dimensionY = Integer.parseInt(prop.getProperty("dimensionY"));
             longBTR = Integer.parseInt(prop.getProperty("longBTR"));
             modelo = prop.getProperty("modelo");
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.err.println(e.getMessage());
                 }
             }
         }
         window.setSize(dimensionX, dimensionY);
         window.setLocation(posicionX, posicionY);
         waterfall = new int[100][longBTR];
-        for (int x = 0; x < 100; x++) {                                                 //inicializa el waterfall en cero
+        for (int x = 0; x < 100; x++) {                                         //inicializa el waterfall en cero
             for (int y = 0; y < longBTR; y++) {
                 waterfall[x][y] = 0;
             }
@@ -103,19 +104,17 @@ public class despliegue extends JComponent {
         InputStream input = null;
         try {
             input = new FileInputStream("config.properties");
-            //load a properties file
             prop.load(input);
-            //get the propperty value and print it out
             dimensionX = Integer.parseInt(prop.getProperty("dimensionX"));
             dimensionY = Integer.parseInt(prop.getProperty("dimensionY"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.err.println(e.getMessage());
                 }
             }
         }
@@ -188,8 +187,8 @@ public class despliegue extends JComponent {
         g.drawLine(inicioCascadaX - 5, inicioCascadaY - 30, getSize().width, inicioCascadaY - 30);
         g.drawLine(inicioCascadaX - 5, inicioCascadaY, inicioCascadaX - 5, getSize().height - 20);
 
-        System.out.println(modelo);
-        System.out.println("SSPP".equals(modelo));
+        //System.out.println(modelo);
+        //System.out.println("SSPP".equals(modelo));
         if ("SSF".equals(modelo) || "SSPV".equals(modelo)) {
             for (int i = 0; i < longBTR - 1; i++) {
                 g.drawLine(inicioCascadaX + (((limX * longBTR) / 6) * i), inicioCascadaY - 30, inicioCascadaX + (((limX * longBTR) / 6) * i), inicioCascadaY - 25);
@@ -211,6 +210,7 @@ public class despliegue extends JComponent {
         }
         //new-------------------------------------------------------------------------------------------------------------------
         g.setColor(new Color(0, 150, 0));
+        xi += limX/2;
         for (int i = 0; i < longBTR - 1; i++) {
             g.drawLine(xi, 95 - (iActual[i] * 90 / 255), xi + limX, 95 - (iActual[i + 1] * 90 / 255));
             xi += limX;
@@ -246,6 +246,11 @@ public class despliegue extends JComponent {
             fY = inicioCascadaY - 3;
             marcacion(g, fX, fY);
         }
+        if(marcacionF != 0){
+            g.setColor(Color.YELLOW);
+            g.drawString("M "+marcacionF, 10, inicioCascadaY - 40);
+            g.fillOval(inicioCascadaX + (((limX * longBTR) * marcacionF) /360 )-(limX/2), inicioCascadaY - 40, 10, 10);
+        }
         //new-------------------------------------------------------------------------------------------------------------------
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
@@ -263,6 +268,10 @@ public class despliegue extends JComponent {
             infoActualNum[x] = 0;
         }
         int n = 0;
+        boolean bMarcacionF = false;
+        if ("SSF".equals(modelo)) {
+            bMarcacionF = true;
+        }
         char[] charArray = infoActual.toCharArray();
         for (char temp : charArray) {
             if (!(temp == ',') && !(temp == ';')) {
@@ -270,9 +279,13 @@ public class despliegue extends JComponent {
             } else {
                 try {
                     infoActualNum[n] = Integer.parseInt(info);
-
+                    if (bMarcacionF) {
+                        marcacionF = Integer.parseInt(info);
+                        n--;
+                        bMarcacionF = false;
+                    }
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    System.err.println("Error: catch "+ e.getMessage());
                 }
                 info = "";
                 n++;
@@ -327,5 +340,6 @@ public class despliegue extends JComponent {
         g.drawLine(punto1.x, punto1.y, punto2.x, punto2.y);
         g.drawLine(p1.x, p1.y, punto.x, punto.y);
         g.drawLine(p2.x, p2.y, punto.x, punto.y);
+
     }
 }

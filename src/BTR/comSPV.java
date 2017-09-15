@@ -8,7 +8,7 @@ package BTR;
 import java.net.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.*;
 import javax.swing.JFrame;
 
 /**
@@ -31,7 +31,10 @@ public class comSPV extends Thread {
     int t = 1000;
     JFrame window;
     despliegue desp;
-    
+    Properties prop = new Properties();
+    InputStream input = null;
+    String DIR = "";
+    int PORT = 0;
 
     public boolean getHabilitado() {
         return this.habilitado;
@@ -40,20 +43,20 @@ public class comSPV extends Thread {
     public void setHabilitado(boolean h) {
         this.habilitado = h;
     }
-    
+
     public void setWindow(JFrame window) {
         this.window = window;
     }
-    
-    public void setMarcacion(boolean b){
+
+    public void setMarcacion(boolean b) {
         System.out.println("marcacion desde SPV");
         desp.setBMarcacion(b);
     }
-    
-    public String getSave(){
+
+    public String getSave() {
         save = "";
-        int[][]waterfall = desp.getWaterfall();
-        String[]time = desp.getTime();
+        int[][] waterfall = desp.getWaterfall();
+        String[] time = desp.getTime();
         for (int x = 0; x < waterfall.length; x++) {
             save += time[x];
             for (int y = 0; y < waterfall[x].length; y++) {
@@ -66,15 +69,31 @@ public class comSPV extends Thread {
 
     public void run() {
         try {
+            try {
+                input = new FileInputStream("config.properties");
+                prop.load(input);
+                DIR = prop.getProperty("dirSSPV");
+                PORT = Integer.parseInt(prop.getProperty("portBTR"));
+                System.out.println("BTR comSPV " + DIR + " " + PORT);
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+            } finally {
+                if (input != null) {
+                    try {
+                        input.close();
+                    } catch (IOException e) {
+                        System.err.println(e.getMessage());
+                    }
+                }
+            }
             desp = new despliegue(this.window);
-            //socket = new Socket("127.0.0.1", 6001);
-            socket = new Socket("192.168.1.10", 20000);
+            socket = new Socket(DIR, PORT);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             BufferedReader inp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             archivo a = new archivo();
             sleep(1000);
             //System.out.println("estoy en el run cpmspv");
-            int n=0;
+            int n = 0;
             String hora;
 
             while (true) {
@@ -98,7 +117,8 @@ public class comSPV extends Thread {
                     if (!error) {
                         mensaje = "BTR1";
                         out.writeUTF(mensaje);
-                        //System.out.println("Envie: " + mensaje);
+                        System.out.println("Envie: " + mensaje);
+                        msn="";
                         msn = inp.readLine();
                         //System.out.println("Recibí: " + msn);
                         char[] charArray = msn.toCharArray();
@@ -131,8 +151,8 @@ public class comSPV extends Thread {
                             mensaje = "BTR2";
                             //System.out.println("Envie: " + mensaje);
                             out.writeUTF(mensaje);
-                            msn = inp.readLine();
-                            //System.out.println("Recibí: " + msn);
+                            msn =inp.readLine();
+                            System.out.println("Recibí: " + msn);
                             charArray = msn.toCharArray();
                             for (char temp : charArray) {
                                 if (temp == ',' || temp == ';') {
@@ -171,18 +191,17 @@ public class comSPV extends Thread {
                                     //System.out.println("Graficaré: " + texto);
                                     //a.escribirTxtLine("resource/btrData.txt", texto);
                                     //window.repaint();
-                                    desp.setInfo(texto,hora);
+                                    desp.setInfo(texto, hora);
                                 }
                             }
                         }
                     }
-                } else {
-                    sleep(2000);
                 }
                 try {
-                    //sleep(t);                                //espera un segundo
+                    sleep(t);
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
+                    System.err.println(e.getMessage());
                 }
             }
         } catch (Exception e) {

@@ -62,14 +62,14 @@ public class comSPPsend extends Thread {
                 input = new FileInputStream("config.properties");
                 prop.load(input);
                 t = Integer.parseInt(prop.getProperty("timeSend"));
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
             } finally {
                 if (input != null) {
                     try {
                         input.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println(e.getMessage());
                     }
                 }
             }
