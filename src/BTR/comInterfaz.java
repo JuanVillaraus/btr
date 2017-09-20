@@ -77,7 +77,6 @@ class comInterfaz extends Thread {
                         break;
                 }
             }
-            //System.out.println(puerto);
             address = InetAddress.getByName("localhost");
             mensaje = "runBTR";
             mensaje_bytes = mensaje.getBytes();
