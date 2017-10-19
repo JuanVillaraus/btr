@@ -97,6 +97,18 @@ public class archivo {
             System.err.println("SOY WRITE hay un error ");
         }
     }
+    
+    public void escribirTxt(String dir, int texto) throws IOException {      //escribe un texto en una archivo existente o lo crea, recibe como parametro la direccion del texto y el texto ambos tipo String
+        BufferedWriter bw;
+        try {
+            File archivo = new File(dir);
+            bw = new BufferedWriter(new FileWriter(archivo));
+            bw.write(Integer.toString(texto));
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("SOY WRITE hay un error ");
+        }
+    }
 
     public void save(String dir) {
         Calendar cal = Calendar.getInstance();

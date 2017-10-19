@@ -5,11 +5,20 @@
  */
 package BTR;
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import javax.swing.*;
+
 /**
  *
  * @author juan
  */
-public class BTR {
+public class BTR{// extends JFrame implements MouseListener{
+    //despliegue desp = new despliegue();
 
     public static void main(String[] args) {
         comInterfaz c = new comInterfaz();

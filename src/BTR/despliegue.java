@@ -6,8 +6,12 @@
 package BTR;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.util.*;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -34,15 +38,18 @@ public class despliegue extends JComponent {
     private int[][] waterfall;
     private String[] time;
     int marcacionF = 0;
+    archivo a = new archivo();
 
     public despliegue(JFrame window) {
+        //this.addMouseListener((MouseListener) window);
         window.add(this);
         //window.pack();
-        window.setUndecorated(true);
+        /*window.setUndecorated(true);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
-        window.setAlwaysOnTop(true);
+        window.setAlwaysOnTop(true);*/
+
         //window.setFocusable(true);
         Properties prop = new Properties();
         InputStream input = null;
@@ -181,6 +188,7 @@ public class despliegue extends JComponent {
         int colorUp = Integer.parseInt(a.leerTxtLine("resource/colorUp.txt"));
         int colorDw = Integer.parseInt(a.leerTxtLine("resource/colorDw.txt"));
         int marcacion = Integer.parseInt(a.leerTxtLine("resource/marcacion.txt"));
+        int marcBTR = Integer.parseInt(a.leerTxtLine("resource/marcBTR.txt"));
 
         g.setColor(Color.WHITE);
         g.drawLine(inicioCascadaX - 5, 1, inicioCascadaX - 5, inicioCascadaY - 30);
@@ -210,7 +218,7 @@ public class despliegue extends JComponent {
         }
         //new-------------------------------------------------------------------------------------------------------------------
         g.setColor(new Color(0, 150, 0));
-        xi += limX/2;
+        xi += limX / 2;
         for (int i = 0; i < longBTR - 1; i++) {
             g.drawLine(xi, 95 - (iActual[i] * 90 / 255), xi + limX, 95 - (iActual[i + 1] * 90 / 255));
             xi += limX;
@@ -246,10 +254,15 @@ public class despliegue extends JComponent {
             fY = inicioCascadaY - 3;
             marcacion(g, fX, fY);
         }
-        if(marcacionF != 0){
+        if (marcacionF != 0) {
             g.setColor(Color.YELLOW);
-            g.drawString("M "+marcacionF, 10, inicioCascadaY - 40);
-            g.fillOval(inicioCascadaX + (((limX * longBTR) * marcacionF) /360 )-(limX/2), inicioCascadaY - 40, 10, 10);
+            g.drawString("M " + marcacionF + "°", 10, inicioCascadaY - 40);
+            g.fillOval(inicioCascadaX + (((limX * longBTR) * marcacionF) / 360) - (limX / 2), inicioCascadaY - 40, 10, 10);
+        }
+        if (marcBTR >= 0 && marcBTR <= 360) {
+            g.setColor(new Color(230, 95, 0));
+            g.drawLine(((marcBTR * limX * longBTR) / 360) + inicioCascadaX, 5, ((marcBTR * limX * longBTR) / 360) + inicioCascadaX, 100);
+            g.drawString("M " + marcBTR + "°", 10, inicioCascadaY - 60);
         }
         //new-------------------------------------------------------------------------------------------------------------------
         Graphics2D g2d = (Graphics2D) g;
@@ -285,7 +298,7 @@ public class despliegue extends JComponent {
                         bMarcacionF = false;
                     }
                 } catch (Exception e) {
-                    System.err.println("Error: catch "+ e.getMessage());
+                    System.err.println("Error: catch " + e.getMessage());
                 }
                 info = "";
                 n++;

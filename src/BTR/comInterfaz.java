@@ -5,6 +5,7 @@
  */
 package BTR;
 
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.net.*;
 import java.text.*;
@@ -31,11 +32,13 @@ class comInterfaz extends Thread {
     Properties prop = new Properties();
     InputStream input = null;
     despliegue desp;
+    winListener window = new winListener();
 
     //@Override
     public void run() {
-        JFrame window = new JFrame("BTR by SIVISO");
+        //JFrame window = new JFrame("BTR by SIVISO");
         //despliegue desp = new despliegue(window);
+        
         try {
             comSPPsend cspps = new comSPPsend();
             comSPV cspv = new comSPV();
@@ -45,14 +48,14 @@ class comInterfaz extends Thread {
                 prop.load(input);
                 modelo = prop.getProperty("modelo");
                 //System.out.println(modelo);
-            } catch (IOException ex) {
-                System.err.println(ex.getMessage());
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
             } finally {
                 if (input != null) {
                     try {
                         input.close();
                     } catch (IOException e) {
-                        System.err.println("Error BTR en la carga del config: " + e.getMessage());
+                        System.err.println("BTR/comInterfaz - Error al leer modelo del archivo config: " + e.getMessage());
                     }
                 }
             }
@@ -69,6 +72,8 @@ class comInterfaz extends Thread {
                         cspps.setPuerto(puerto);
                         cspps.start();
                         desp = new despliegue(window);
+                        desp.addMouseListener(window);
+                        
                         break;
                     case "SSPV":
                         puerto = 5003;
