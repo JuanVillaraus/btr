@@ -24,21 +24,22 @@ class comInterfaz extends Thread {
     String modelo = "";
     String mensaje = "";
     DatagramPacket paquete;
+    DatagramPacket paqueteSend;
     int puerto = 0;
     String cadenaMensaje = "";
     DatagramPacket servPaquete;
     byte[] RecogerServidor_bytes = new byte[256];
-    String texto = "";
     Properties prop = new Properties();
     InputStream input = null;
     despliegue desp;
     winListener window = new winListener();
+    String word;
 
     //@Override
     public void run() {
         //JFrame window = new JFrame("BTR by SIVISO");
         //despliegue desp = new despliegue(window);
-        
+
         try {
             comSPPsend cspps = new comSPPsend();
             comSPV cspv = new comSPV();
@@ -73,20 +74,26 @@ class comInterfaz extends Thread {
                         cspps.start();
                         desp = new despliegue(window);
                         desp.addMouseListener(window);
-                        
+
                         break;
                     case "SSPV":
                         puerto = 5003;
+                        //cspv.start();
+                        //cspv.setHabilitado(true);
                         break;
                     default:
                         break;
                 }
             }
             address = InetAddress.getByName("localhost");
+            socket = new DatagramSocket();
+            mensaje = "BTR";
+            mensaje_bytes = mensaje.getBytes();
+            paqueteSend = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
+            //socket.send(paqueteSend);
             mensaje = "runBTR";
             mensaje_bytes = mensaje.getBytes();
             paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
-            socket = new DatagramSocket();
             socket.send(paquete);
             System.out.println("enviamos " + mensaje + " para inicializar la comunicación con la interfaz");
             archivo a = new archivo();
@@ -98,7 +105,6 @@ class comInterfaz extends Thread {
                 socket.receive(servPaquete);
                 cadenaMensaje = new String(RecogerServidor_bytes).trim();   //Convertimos el mensaje recibido en un string
                 System.out.println("Recibí: " + cadenaMensaje);
-                texto = "";
                 switch (cadenaMensaje) {
                     case "RUN":
                         cspv.start();
@@ -117,14 +123,23 @@ class comInterfaz extends Thread {
                         window.setExtendedState(JFrame.NORMAL);
                         cspps.setHabilitado(true);
                         cspv.setHabilitado(true);
+                        mensaje = "Cu" + Integer.toString(desp.getColorUp());
+                        mensaje_bytes = mensaje.getBytes();
+                        paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, 5002);
+                        socket.send(paquete);
+                        mensaje = "Cd" + Integer.toString(desp.getColorDw());
+                        mensaje_bytes = mensaje.getBytes();
+                        paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, 5002);
+                        socket.send(paquete);
                         break;
                     case "EXIT":
                         System.exit(0);
                         break;
                     case "SAVE":
-                        if ("SSPV".equals(modelo)) {
+                        /*if ("SSPV".equals(modelo)) {
                             a.save("resource/btrData.txt", cspv.getSave());
-                        }
+                        }*/
+                        desp.save();
                         break;
                     case "RP":
                         window.repaint();
@@ -157,16 +172,34 @@ class comInterfaz extends Thread {
                         break;
                     default:
                         char[] charArray = cadenaMensaje.toCharArray();
-                        for (char temp : charArray) {
-                            texto += temp;
-                        }
-                        if ("SSPP".equals(modelo) || "SSF".equals(modelo)) {
+                        word = "";
+                        if (charArray[0] == 'C' || charArray[0] == 'U') {
+                            for (int i = 2; i < charArray.length; i++) {
+                                word += charArray[i];
+                            }
+                            if (charArray[0] == 'C') {
+                                if (charArray[1] == 'u') {
+                                    desp.setColorUp(Integer.parseInt(word));
+                                } else if (charArray[1] == 'd') {
+                                    desp.setColorDw(Integer.parseInt(word));
+                                }
+                            } else if (charArray[0] == 'U') {
+                                if (charArray[1] == 'u') {
+                                    desp.setUmbralUp(Integer.parseInt(word));
+                                } else if (charArray[1] == 'd') {
+                                    desp.setUmbralDw(Integer.parseInt(word));
+                                }
+                            }
+                        } else if ("SSPP".equals(modelo) || "SSF".equals(modelo)) {
                             Calendar cal = Calendar.getInstance();
                             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                             hora = sdf.format(cal.getTime());
                             //a.escribirTxtLine("resource/btrData.txt", texto);
                             //window.repaint();
-                            desp.setInfo(texto, hora);
+                            desp.setInfo(cadenaMensaje, hora);
+                            if (charArray[0] != '$') {
+                                socket.send(paqueteSend);
+                            }
                         }
                         break;
                 }

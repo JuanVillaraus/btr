@@ -27,6 +27,8 @@ public class winListener extends JFrame implements MouseListener {
 
     public winListener() {
         //setName("BTR by SIVISO");
+        //this.setTitle("BTR by SIVISO");
+        
         //pack();
         setUndecorated(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -82,7 +84,8 @@ public class winListener extends JFrame implements MouseListener {
             }
             System.out.println("Angulo: " + ang + "\tMarcación: " + marcBTR + " ");
             try {
-                a.escribirTxt("resource/marcBTR.txt", ang);
+                a.escribirTxt("resource/angBTR.txt", ang);
+                a.escribirTxt("resource/marcBTR.txt", marcBTR);
             } catch (IOException ex) {
                 System.err.println("Error al intentar guardar la marcBTR " + ex.getMessage());;
             }

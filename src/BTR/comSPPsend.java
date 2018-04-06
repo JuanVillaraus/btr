@@ -54,7 +54,6 @@ public class comSPPsend extends Thread {
             mensaje_bytes = mensaje.getBytes();
             paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
             socket = new DatagramSocket();
-            socket.send(paquete);
             int n = 0;
             Properties prop = new Properties();
             InputStream input = null;

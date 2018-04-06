@@ -37,8 +37,13 @@ public class despliegue extends JComponent {
     private int[] iActual;
     private int[][] waterfall;
     private String[] time;
+    private int colorUp = 255;
+    private int colorDw = 0;
+    private int UmbralUp = 2;
+    private int UmbralDw = 1;
     int marcacionF = 0;
     archivo a = new archivo();
+    int act = 0;
 
     public despliegue(JFrame window) {
         //this.addMouseListener((MouseListener) window);
@@ -84,9 +89,9 @@ public class despliegue extends JComponent {
         }
         window.setSize(dimensionX, dimensionY);
         window.setLocation(posicionX, posicionY);
-        waterfall = new int[100][longBTR];
+        waterfall = new int[100][longBTR + 1];
         for (int x = 0; x < 100; x++) {                                         //inicializa el waterfall en cero
-            for (int y = 0; y < longBTR; y++) {
+            for (int y = 0; y < longBTR + 1; y++) {
                 waterfall[x][y] = 0;
             }
         }
@@ -158,6 +163,26 @@ public class despliegue extends JComponent {
         repaint();
     }
 
+    public void setColorUp(int colorUp) {
+        this.colorUp = colorUp;
+        repaint();
+    }
+
+    public void setColorDw(int colorDw) {
+        this.colorDw = colorDw;
+        repaint();
+    }
+
+    public void setUmbralUp(int umbralUp) {
+        this.UmbralUp = umbralUp;
+        repaint();
+    }
+
+    public void setUmbralDw(int umbralDw) {
+        this.UmbralDw = umbralDw;
+        repaint();
+    }
+
     public int[][] getWaterfall() {
         return this.waterfall;
     }
@@ -174,6 +199,22 @@ public class despliegue extends JComponent {
         return this.bMarcacion;
     }
 
+    public int getColorUp() {
+        return this.colorUp;
+    }
+
+    public int getColorDw() {
+        return this.colorDw;
+    }
+
+    public int getUmbralUp() {
+        return this.UmbralUp;
+    }
+
+    public int getUmbralDw() {
+        return this.UmbralDw;
+    }
+
     public void desp(Graphics g, int limX, int limY) {
         archivo a = new archivo();
         String DIR = "resource/btrData.txt";   //variable estatica que guarda el nombre del archivo donde se guardara la informacion recivida para desplegarse
@@ -181,14 +222,16 @@ public class despliegue extends JComponent {
         xi = inicioCascadaX;     //variable de control grafico en Y que guarda la acumulacion del incremento para la graficacion
         c = 0;
         int t = 0;
-        waterfall = getWaterfall();
-        iActual = getIActual();
-        time = getTime();
+        int[][] waterfall = getWaterfall();
+        int[] iActual = getIActual();
+        String[] time = getTime();
 
-        int colorUp = Integer.parseInt(a.leerTxtLine("resource/colorUp.txt"));
-        int colorDw = Integer.parseInt(a.leerTxtLine("resource/colorDw.txt"));
+        int umbralUp = getUmbralUp();
+        int umbralDw = getUmbralDw();
+        int colorUp = getColorUp();  //Integer.parseInt(a.leerTxtLine("resource/colorUp.txt"));
+        int colorDw = getColorDw();  //Integer.parseInt(a.leerTxtLine("resource/colorDw.txt"));
         int marcacion = Integer.parseInt(a.leerTxtLine("resource/marcacion.txt"));
-        int marcBTR = Integer.parseInt(a.leerTxtLine("resource/marcBTR.txt"));
+        int angBTR = Integer.parseInt(a.leerTxtLine("resource/angBTR.txt"));
 
         g.setColor(Color.WHITE);
         g.drawLine(inicioCascadaX - 5, 1, inicioCascadaX - 5, inicioCascadaY - 30);
@@ -223,29 +266,47 @@ public class despliegue extends JComponent {
             g.drawLine(xi, 95 - (iActual[i] * 90 / 255), xi + limX, 95 - (iActual[i + 1] * 90 / 255));
             xi += limX;
         }
+        System.out.println("wf: "+waterfall[1][0]+"\tUmbral: "+umbralUp);
 
         for (int x = 0; x < waterfall.length; x++) {
             xi = inicioCascadaX;
-            for (int y = 0; y < waterfall[x].length; y++) {
-                if (waterfall[x][y] >= 0 && waterfall[x][y] <= 255) {
-                    if (waterfall[x][y] < colorDw) {
-                        g.setColor(Color.BLACK);
-                    } else if (waterfall[x][y] > colorUp) {
-                        g.setColor(Color.GREEN);
+            //if (waterfall[x][0] == 0) {
+                for (int y = 1; y < waterfall[x].length; y++) {
+                    if (waterfall[x][y] >= 0 && waterfall[x][y] <= 255) {
+                        if (waterfall[x][y] < colorDw) {
+                            g.setColor(Color.BLACK);
+                            System.out.print("M");
+                        } else if (waterfall[x][y] > colorUp) {
+                            System.out.print("N");
+                            if (waterfall[x][0] > umbralUp || waterfall[x][0] == 0) {
+                                g.setColor(Color.GREEN);
+                            } else if (waterfall[x][0] > umbralDw) {
+                                g.setColor(Color.RED);
+                            } else if (waterfall[x][0] <= umbralDw) {
+                                g.setColor(Color.BLUE);
+                            }
+                        } else if (waterfall[x][0] > umbralUp || waterfall[x][0] == 0) { 
+                            g.setColor(new Color(0, (waterfall[x][y] - colorDw) * 255 / (colorUp - colorDw), 0));
+                        } else if (waterfall[x][0] > umbralDw) {
+                            g.setColor(new Color((waterfall[x][y] - colorDw) * 255 / (colorUp - colorDw), 0, 0));
+                            System.out.print("R");
+                        } else if (waterfall[x][0] <= umbralDw) {
+                            g.setColor(new Color(0, 0, (waterfall[x][y] - colorDw) * 255 / (colorUp - colorDw)));
+                            System.out.print("B");
+                        }
+                        g.fillRect(xi, yi, limX, limY);
+                        if ((x % 10) == 0) {
+                            g.setColor(Color.WHITE);
+                            g.drawLine(inicioCascadaX - 10, yi, inicioCascadaX - 05, yi);
+                            g.drawString(time[x], 5, yi + 3);
+                        }
+                        xi += limX;
                     } else {
-                        g.setColor(new Color(0, (waterfall[x][y] - colorDw) * 255 / (colorUp - colorDw), 0));
+                        System.out.println("Error #??: el valor a desplegar esta fuera de rango");
                     }
-                    g.fillRect(xi, yi, limX, limY);
-                    if ((x % 10) == 0) {
-                        g.setColor(Color.WHITE);
-                        g.drawLine(inicioCascadaX - 10, yi, inicioCascadaX - 05, yi);
-                        g.drawString(time[x], 5, yi + 3);
-                    }
-                    xi += limX;
-                } else {
-                    System.out.println("Error #??: el valor a desplegar esta fuera de rango");
                 }
-            }
+                //System.out.println("");
+            //}
             yi += limY;
         }
         if (getBMarcacion()) {
@@ -259,10 +320,12 @@ public class despliegue extends JComponent {
             g.drawString("M " + marcacionF + "°", 10, inicioCascadaY - 40);
             g.fillOval(inicioCascadaX + (((limX * longBTR) * marcacionF) / 360) - (limX / 2), inicioCascadaY - 40, 10, 10);
         }
-        if (marcBTR >= 0 && marcBTR <= 360) {
-            g.setColor(new Color(230, 95, 0));
-            g.drawLine(((marcBTR * limX * longBTR) / 360) + inicioCascadaX, 5, ((marcBTR * limX * longBTR) / 360) + inicioCascadaX, 100);
-            g.drawString("M " + marcBTR + "°", 10, inicioCascadaY - 60);
+        if ("SSPV".equals(modelo)) {
+            if (angBTR >= 0 && angBTR <= 360) {
+                g.setColor(new Color(230, 95, 0));
+                g.drawLine(((angBTR * limX * longBTR) / 360) + inicioCascadaX, 5, ((angBTR * limX * longBTR) / 360) + inicioCascadaX, 100);
+                g.drawString("M " + angBTR + "°", 10, inicioCascadaY - 60);
+            }
         }
         //new-------------------------------------------------------------------------------------------------------------------
         Graphics2D g2d = (Graphics2D) g;
@@ -274,54 +337,85 @@ public class despliegue extends JComponent {
     }
 
     public void setInfo(String infoActual, String hora) {
-        System.out.println("setInfo");
+        //System.out.println("setInfo");
         info = "";
-        int[] infoActualNum = new int[iActual.length];
+        act++;
+        int[] infoActualNum = new int[longBTR + 1];
+        int[][] waterfall;
+        String[] time;
         for (int x = 0; x < infoActualNum.length; x++) {
             infoActualNum[x] = 0;
         }
         int n = 0;
+        infoActualNum[n] = 0;
+        n++;
         boolean bMarcacionF = false;
         if ("SSF".equals(modelo)) {
             bMarcacionF = true;
         }
         char[] charArray = infoActual.toCharArray();
         for (char temp : charArray) {
-            if (!(temp == ',') && !(temp == ';')) {
+            if (temp == '$') {
+                System.out.println("Biestatico");
+                n--;
+            } else if (!(temp == ',') && !(temp == ';')) {
                 info += temp;
             } else {
                 try {
-                    infoActualNum[n] = Integer.parseInt(info);
-                    if (bMarcacionF) {
+                    infoActualNum[n] = (int) (Double.parseDouble(info)); //Integer.parseInt(info);
+                    if (bMarcacionF && n != 0) {
                         marcacionF = Integer.parseInt(info);
                         n--;
                         bMarcacionF = false;
                     }
                 } catch (Exception e) {
-                    System.err.println("Error: catch " + e.getMessage());
+                    System.err.println("Error catch del setInfo: " + e.getMessage());
                 }
                 info = "";
                 n++;
             }
         }
+        System.out.print(getUmbralUp());
+        for (int i = 0; i < infoActualNum.length; i++) {
+            System.out.print(" " + infoActualNum[i]);
+        }
+        System.out.println("");
+        System.out.println("");
         setIActual(infoActualNum);
         tiempoLocal++;
-        //if (tiempoOper < tiempoLocal) {
-        waterfall = getWaterfall();
+        if ("SSF".equals(modelo) || act == 100) {
+            waterfall = getWaterfall();
+            for (int x = waterfall.length - 1; x > 0; x--) {
+                waterfall[x] = waterfall[x - 1];
+            }
+            waterfall[0] = infoActualNum;
+            setWaterfall(waterfall);
+            time = getTime();
+            for (int x = time.length - 1; x > 0; x--) {
+                time[x] = time[x - 1];
+            }
+            time[0] = hora;
+            setTime(time);
+            act = 0;
+        }
+        //}
+        repaint();
+    }
+
+    public void setInfo(int[] infoActual, String hora) {
+        int[][] waterfall = getWaterfall();
+        String[] time = getTime();
+        setIActual(infoActual);
         for (int x = waterfall.length - 1; x > 0; x--) {
             waterfall[x] = waterfall[x - 1];
         }
-        waterfall[0] = infoActualNum;
+        waterfall[0] = infoActual;
         setWaterfall(waterfall);
-        time = getTime();
         for (int x = time.length - 1; x > 0; x--) {
             time[x] = time[x - 1];
         }
         time[0] = hora;
         setTime(time);
-        tiempoLocal = 0;
-        //}
-        repaint();
     }
 
     public void marcacion(Graphics g, int fX, int fY) {
@@ -355,4 +449,25 @@ public class despliegue extends JComponent {
         g.drawLine(p2.x, p2.y, punto.x, punto.y);
 
     }
+
+    public void save() {
+        String s = "";
+        for (int x = 0; x < waterfall.length; x++) {
+            for (int y = 0; y < waterfall[0].length; y++) {
+                if (y == 0) {
+                    s += time[y] + ",";
+                }
+                s += waterfall[x][y];
+                if (y < waterfall[0].length - 1) {
+                    s += ",";
+                }
+            }
+            s += ";";
+            if (x < waterfall.length - 1) {
+                s += "\n";
+            }
+        }
+        a.save("resource/BTR", s);
+    }
+
 }
