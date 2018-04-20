@@ -34,11 +34,19 @@ class comInterfaz extends Thread {
     despliegue desp;
     winListener window = new winListener();
     String word;
+    archivo a = new archivo();
 
     //@Override
     public void run() {
         //JFrame window = new JFrame("BTR by SIVISO");
         //despliegue desp = new despliegue(window);
+        try {
+            a.escribirTxt("resource/angBTR.txt", -1);
+            a.escribirTxt("resource/marcBTRX.txt", 0);
+            a.escribirTxt("resource/marcBTRY.txt", 0);
+        } catch (IOException ex) {
+            System.err.println("Error al intentar guardar la marcBTR " + ex.getMessage());;
+        }
 
         try {
             comSPPsend cspps = new comSPPsend();
@@ -98,6 +106,7 @@ class comInterfaz extends Thread {
             System.out.println("enviamos " + mensaje + " para inicializar la comunicación con la interfaz");
             archivo a = new archivo();
             String hora;
+            window.setPort(socket.getLocalPort());
 
             do {
                 RecogerServidor_bytes = new byte[256];
@@ -170,6 +179,20 @@ class comInterfaz extends Thread {
                         paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
                         socket.send(paquete);
                         break;
+                    case "DISTARGET":
+                        int[][] t = desp.getTarget();
+                        mensaje = "D" + Integer.toString(desp.distTarget())+","+Integer.toString(t[0][0])+","+Integer.toString(t[1][0])+";";
+                        /*String s = "";
+                        for (int x = 0; x < t.length; x++) {
+                            for (int y = 0; y < t[x].length; y++) {
+                                System.out.print(" "+t[x][y]);
+                            }
+                            System.out.println("");
+                        }*/
+                        mensaje_bytes = mensaje.getBytes();
+                        paquete = new DatagramPacket(mensaje_bytes, mensaje.length(), address, puerto);
+                        socket.send(paquete);
+                        break;
                     default:
                         char[] charArray = cadenaMensaje.toCharArray();
                         word = "";
@@ -190,22 +213,34 @@ class comInterfaz extends Thread {
                                     desp.setUmbralDw(Integer.parseInt(word));
                                 }
                             }
+                        } else if (charArray[0] == 'T') {
+                            desp.newTarget(charArray);
+                            //desp.newTarget(cadenaMensaje);
+                        } else if (charArray[0] == 'P') {
+                            for (int i = 1; i < charArray.length; i++) {
+                                word += charArray[i];
+                            }
+                            //desp.setPaso(Integer.parseInt(word));
+                            //desp.setPuertoPPI(Integer.parseInt(word));
                         } else if ("SSPP".equals(modelo) || "SSF".equals(modelo)) {
                             Calendar cal = Calendar.getInstance();
                             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                             hora = sdf.format(cal.getTime());
                             //a.escribirTxtLine("resource/btrData.txt", texto);
                             //window.repaint();
-                            desp.setInfo(cadenaMensaje, hora);
-                            if (charArray[0] != '$') {
+                            if (charArray[0] == '$') {
+                                desp.setInfo(cadenaMensaje, hora, 'B');
+                            } else {
                                 socket.send(paqueteSend);
+                                desp.setInfo(cadenaMensaje, hora, 'M');
                             }
+                            cspps.setEstadoEnvio(false);
                         }
                         break;
                 }
             } while (true);
         } catch (Exception e) {
-            System.err.println("Error en la comunicación con la consola " + e.getMessage());
+            System.err.println("BTR/comInterfaz - Error en la comunicación con la consola " + e.getMessage());
             System.exit(1);
         }
     }

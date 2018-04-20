@@ -3,6 +3,9 @@ package BTR;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,11 +27,18 @@ public class winListener extends JFrame implements MouseListener {
     int marcBTR;
     int ang;
     archivo a = new archivo();
+    private int port = 0;
+    DatagramSocket socket;
+    InetAddress address;
+    byte[] mensaje_bytes = new byte[256];
+    String mensaje = "";
+    DatagramPacket paquete;
+    DatagramPacket paqueteSend;
 
     public winListener() {
         //setName("BTR by SIVISO");
         //this.setTitle("BTR by SIVISO");
-        
+
         //pack();
         setUndecorated(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -73,10 +83,11 @@ public class winListener extends JFrame implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println(e.getX() + " " + e.getY());
+        //System.out.println(e.getX() + " " + e.getY());
+
         if (e.getX() > 75 && e.getY() < 100) {
             ang = ((e.getX() - 75) * 360) / (((getSize().width - 75) / longBTR) * longBTR);
-            marcBTR = (int)((((e.getX() - 75) * 360) / (((getSize().width - 75) / longBTR) * longBTR)) / 4.5)+1;
+            marcBTR = (int) ((((e.getX() - 75) * 360) / (((getSize().width - 75) / longBTR) * longBTR)) / 4.5) + 1;
             if (marcBTR > 80) {
                 System.out.print(marcBTR + " - ");
                 marcBTR = 1;
@@ -88,6 +99,31 @@ public class winListener extends JFrame implements MouseListener {
                 a.escribirTxt("resource/marcBTR.txt", marcBTR);
             } catch (IOException ex) {
                 System.err.println("Error al intentar guardar la marcBTR " + ex.getMessage());;
+            }
+            repaint();
+        }
+        if (e.getX() > 75 && e.getY() > 100) {
+            ang = ((e.getX() - 75) * 360) / (((getSize().width - 75) / longBTR) * longBTR);
+            marcBTR = (int) ((((e.getX() - 75) * 360) / (((getSize().width - 75) / longBTR) * longBTR)) / 4.5) + 1;
+            if (marcBTR > 80) {
+                System.out.print(marcBTR + " - ");
+                marcBTR = 1;
+                System.out.println(marcBTR);
+            }
+            //System.out.println("Angulo: " + ang + "\tX: " + e.getX() + "\tY: " + e.getY() + " ");
+            try {
+                address = InetAddress.getByName("localhost");
+                socket = new DatagramSocket();
+                //a.escribirTxt("resource/angBTR.txt", ang);
+                //a.escribirTxt("resource/marcBTRX.txt", e.getX());
+                //a.escribirTxt("resource/marcBTRY.txt", e.getY());
+                mensaje = "T"+ang+","+e.getX()+","+e.getY()+";";
+                mensaje_bytes = mensaje.getBytes();
+                //System.out.println("port: "+getPort());
+                paqueteSend = new DatagramPacket(mensaje_bytes, mensaje.length(), address, getPort());
+                socket.send(paqueteSend);
+            } catch (IOException ex) {
+                System.err.println("Error al intentar guardar la marcBTR " + ex.getMessage());
             }
             repaint();
         }
@@ -106,6 +142,14 @@ public class winListener extends JFrame implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public int getPort() {
+        return this.port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
 }

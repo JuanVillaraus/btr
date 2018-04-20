@@ -28,6 +28,7 @@ public class comSPPsend extends Thread {
     DatagramPacket paquete;
     boolean habilitado = false;
     int t = 1000;
+    boolean estadoEnvio = true;
 
     public comSPPsend() {
 
@@ -36,6 +37,10 @@ public class comSPPsend extends Thread {
     public boolean getHabilitado() {
         return this.habilitado;
     }
+    
+    public boolean getEstadoEnvio() {
+        return this.estadoEnvio;
+    }
 
     public void setHabilitado(boolean h) {
         this.habilitado = h;
@@ -43,6 +48,10 @@ public class comSPPsend extends Thread {
     
     public void setPuerto(int puerto){
         this.puerto = puerto;
+    }
+    
+    public void setEstadoEnvio(boolean estadoEnvio) {
+        this.estadoEnvio = estadoEnvio;
     }
 
     @Override
@@ -77,7 +86,10 @@ public class comSPPsend extends Thread {
                     n++;
                     System.out.println(n);
                     sleep(t);      
-                    socket.send(paquete);
+                    if (getEstadoEnvio()) {
+                        socket.send(paquete);
+                    }
+                    setEstadoEnvio(true);
                 }
                 try {
                     sleep(t);                                //espera un segundo
