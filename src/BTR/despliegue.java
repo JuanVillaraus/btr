@@ -604,6 +604,11 @@ public class despliegue extends JComponent {
         int n = 0;
         infoActualNum[n] = 0;
         n++;
+        if (modo == 'B' && modoActual == 'M') {
+            separacionWaterfall(hora);
+        }
+        System.out.println("modo: " + modo + "\tmodoActual: " + modoActual);
+        setModo(modoActual);
         boolean bMarcacionF = false;
         if ("SSF".equals(modelo)) {
             bMarcacionF = true;
@@ -618,12 +623,13 @@ public class despliegue extends JComponent {
                 info += temp;
             } else {
                 try {
-                    infoActualNum[n] = (int) (Double.parseDouble(info)); //Integer.parseInt(info);
                     if (bBiestatico) {
                         if (infoActualNum[n] == 0) {
+                            infoActualNum[n] = (int) ((Double.parseDouble(info)) * 100);
                             nBiestatico = 0;
                             bMarcacionF = true;
                         } else {
+                            infoActualNum[n] = Integer.parseInt(info);
                             int nB = infoActualNum[n];
                             nBiestatico++;
                             if (nBiestatico > nB) {
@@ -674,18 +680,7 @@ public class despliegue extends JComponent {
             act = 0;
         }
         //}
-        if (modo != modoActual) {
-            setModo(modoActual);
-            for (int x = 0; x < infoActualNum.length; x++) {
-                infoActualNum[x] = 300;
-            }
-            for (int x = waterfall.length - 1; x > 0; x--) {
-                waterfall[x] = waterfall[x - 1];
-            }
-            waterfall[0] = infoActualNum;
-            setWaterfall(waterfall);
-            setTimeActual(hora);
-        }
+
         int[][] target = getTarget();
         int incTargetY = getIncTargetY();
         //for (int x = 0; x < target.length; x++) {
@@ -833,5 +828,19 @@ public class despliegue extends JComponent {
         }
         System.out.println("" + newTarget + " " + nTarget);
         System.out.println("");*/
+    }
+
+    public void separacionWaterfall(String hora) {
+        int[] infoActualNum = new int[longBTR + 1];
+        for (int x = 0; x < infoActualNum.length; x++) {
+            infoActualNum[x] = 300;
+        }
+        for (int x = waterfall.length - 1; x > 0; x--) {
+            waterfall[x] = waterfall[x - 1];
+        }
+        waterfall[0] = infoActualNum;
+        setWaterfall(waterfall);
+        setTimeActual(hora);
+
     }
 }

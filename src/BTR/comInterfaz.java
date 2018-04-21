@@ -107,6 +107,8 @@ class comInterfaz extends Thread {
             archivo a = new archivo();
             String hora;
             window.setPort(socket.getLocalPort());
+                            Calendar cal = Calendar.getInstance();
+                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
             do {
                 RecogerServidor_bytes = new byte[256];
@@ -128,6 +130,9 @@ class comInterfaz extends Thread {
                         cspps.setHabilitado(false);
                         cspv.setHabilitado(false);
                         break;
+                    case "BIESTATICO":
+                        hora = sdf.format(cal.getTime());
+                        desp.separacionWaterfall(hora);
                     case "ON":
                         window.setExtendedState(JFrame.NORMAL);
                         cspps.setHabilitado(true);
@@ -208,9 +213,9 @@ class comInterfaz extends Thread {
                                 }
                             } else if (charArray[0] == 'U') {
                                 if (charArray[1] == 'u') {
-                                    desp.setUmbralUp(Integer.parseInt(word));
+                                    desp.setUmbralUp((int)(Double.parseDouble(word)*100));
                                 } else if (charArray[1] == 'd') {
-                                    desp.setUmbralDw(Integer.parseInt(word));
+                                    desp.setUmbralDw((int)(Double.parseDouble(word)*100));
                                 }
                             }
                         } else if (charArray[0] == 'T') {
@@ -223,8 +228,6 @@ class comInterfaz extends Thread {
                             //desp.setPaso(Integer.parseInt(word));
                             //desp.setPuertoPPI(Integer.parseInt(word));
                         } else if ("SSPP".equals(modelo) || "SSF".equals(modelo)) {
-                            Calendar cal = Calendar.getInstance();
-                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                             hora = sdf.format(cal.getTime());
                             //a.escribirTxtLine("resource/btrData.txt", texto);
                             //window.repaint();
