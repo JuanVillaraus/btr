@@ -457,7 +457,7 @@ public class despliegue extends JComponent {
                 g.drawLine(target[0][1], 100, target[0][1], target[0][2]);
                 g.drawLine(inicioCascadaX, target[0][2], target[0][1], target[0][2]);
                 g.fillOval(target[0][1] - 5, target[0][2] - 5, 10, 10);
-                g.drawString("T " + target[0][0] + "°", 10, inicioCascadaY - 100);
+                g.drawString("A " + target[0][0] + "°", 10, inicioCascadaY - 100);
             }
             if (target[1][1] != 0 && target[1][2] != 0) {
                 g.drawLine(target[1][1], 100, target[1][1], target[1][2]);
@@ -468,10 +468,10 @@ public class despliegue extends JComponent {
             g.setFont(new Font("Calibri", 0, 8));
             g.setColor(Color.WHITE);
             if (target[0][1] != 0 && target[0][2] != 0) {
-                g.drawString("1", target[0][1] - 2, target[0][2] + 3);
+                g.drawString("A", target[0][1] - 2, target[0][2] + 3);
             }
             if (target[1][1] != 0 && target[1][2] != 0) {
-                g.drawString("2", target[1][1] - 3, target[1][2] + 3);
+                g.drawString("T", target[1][1] - 2, target[1][2] + 3);
             }
             int coorX1 = (target[0][1] - inicioCascadaX) / limX;
             int coorY1 = (target[0][2] - inicioCascadaY) / limY;
@@ -488,10 +488,10 @@ public class despliegue extends JComponent {
                 System.out.println("\tT2 : " + time[coorY2]);
             }
             if (coorY1 >= 0 && coorY2 >= 0 && !"".equals(time[coorY1]) && !"".equals(time[coorY2])) {
-                String time1 = time[coorY1] + ':';
+                /*String time1 = time[coorY1] + ':';
                 String time2 = time[coorY2] + ':';
                 String word = "";
-                /*int n = 0;
+                int n = 0;
                 int[] hr = {0, 0, 0};
                 int[] mn = {0, 0, 0};
                 int[] sg = {0, 0, 0};
